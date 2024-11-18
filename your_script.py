@@ -58,14 +58,15 @@ def main():
         # Excel更新
         if st.button("Excelファイルを生成する"):
             # GitHubのリポジトリURL
+            import shutil
             github_url = "https://github.com/shintarotakasaki/excel3/raw/main/伝票(規格品)_ラベル_指示書.xlsm"
 
             # ファイルをダウンロードして一時ファイルとして保存
-            response = requests.get(github_url)
+            response = requests.get(github_url,stream=True)
             if response.status_code == 200:
-                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                    tmp_file.write(response.content)
-                    file_path = tmp_file.name
+                with open("伝票(規格品)_ラベル_指示書.xlsm",'wb')as f:
+                    response.raw.decode_content = True
+                    shutil.copyfileobj(responce.raw, f)
             
             try:
                 wb = load_workbook(file_path, keep_vba=True)
