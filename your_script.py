@@ -67,45 +67,47 @@ def main():
                     tmp_file.write(response.content)
                     file_path = tmp_file.name
             
-
-              wb = load_workbook(file_path, keep_vba=True)
-              ws = wb.active
+            try:
+                wb = load_workbook(file_path, keep_vba=True)
+                ws = wb.active
                 
-              # Excelファイルへの書き込み
-              ws['AH3'] = syukka
-              ws['AM9'] = buturyu
-              ws['AB4'] = konpou + "梱包"
+                # Excelファイルへの書き込み
+                ws['AH3'] = syukka
+                ws['AM9'] = buturyu
+                ws['AB4'] = konpou + "梱包"
 
-              zig_tok = ""
-              for i, text in enumerate(text_list):
-                  if labels[i] == 'AC9-1':
-                      zig_tok = text
-                  elif labels[i] == 'AC9':
-                      ws[labels[i]] = zig_tok + '-' + text
-                  elif labels[i] == 'AC11':
-                      ws[labels[i]] = text + "様"
-                  elif labels[i] == 'AC13':
-                      ws[labels[i]] = '届け先：' + text
-                  elif labels[i] == 'AC15':
-                      ws[labels[i]] = text + "様" if text else "=AC11"
-                  elif labels[i] == 'AC17':
-                      ws[labels[i]] = '現場名：' + text
-                  else:
-                      ws[labels[i]] = text
+                zig_tok = ""
+                for i, text in enumerate(text_list):
+                    if labels[i] == 'AC9-1':
+                        zig_tok = text
+                    elif labels[i] == 'AC9':
+                        ws[labels[i]] = zig_tok + '-' + text
+                    elif labels[i] == 'AC11':
+                        ws[labels[i]] = text + "様"
+                    elif labels[i] == 'AC13':
+                        ws[labels[i]] = '届け先：' + text
+                    elif labels[i] == 'AC15':
+                        ws[labels[i]] = text + "様" if text else "=AC11"
+                    elif labels[i] == 'AC17':
+                        ws[labels[i]] = '現場名：' + text
+                    else:
+                        ws[labels[i]] = text
 
-              # 保存とダウンロード
-              wb.save(file_path)
-              st.success("Excelファイルが上書き保存されました！")                
+                # 保存とダウンロード
+                wb.save(file_path)
+                st.success("Excelファイルが上書き保存されました！")                
 
-              #ファイルをダウンロード
-              st.write("保存されたファイルを以下のリンクからダウンロードしてください:")
-              with open(file_path, "rb") as file:
-                  st.download_button(
-                      label="ダウンロードする",
-                      data=file,
-                      file_name="伝票(規格品)_ラベル_指示書.xlsm",
-                      mime="application/vnd.ms-excel"
-                  )
+                #ファイルをダウンロード
+                st.write("保存されたファイルを以下のリンクからダウンロードしてください:")
+                with open(file_path, "rb") as file:
+                    st.download_button(
+                        label="ダウンロードする",
+                        data=file,
+                        file_name="伝票(規格品)_ラベル_指示書.xlsm",
+                        mime="application/vnd.ms-excel"
+                    )
+            except Exception as e:
+                st.error(f"エラーが発生しました: {e}")                
 
 if __name__ == "__main__":
     main()
