@@ -66,7 +66,7 @@ def main():
             if response.status_code == 200:
                 with open("伝票(規格品)_ラベル_指示書.xlsm",'wb')as f:
                     response.raw.decode_content = True
-                    shutil.copyfileobj(responce.raw, f)
+                    shutil.copyfileobj(response.raw, f)
             
             try:
                 wb = load_workbook(file_path, keep_vba=True)
