@@ -1,7 +1,8 @@
 import streamlit as st
 import fitz  # PyMuPDF
 from openpyxl import load_workbook
-import os
+import requests
+import tempfile
 
 # PDFからテキストを抽出する関数
 def extract_text_from_pdf(pdf_file, rects):
@@ -23,7 +24,7 @@ def extract_text_from_pdf(pdf_file, rects):
 
 # StreamlitによるGUI
 def main():
-    st.title("PDFからテキストを抽出してExcelを更新するアプリ")
+    st.title("伝票作成アプリ")
 
     # PDFアップロード
     uploaded_pdf = st.file_uploader("PDFファイルをアップロードしてください", type=["pdf"])
@@ -56,53 +57,55 @@ def main():
 
         # Excel更新
         if st.button("Excelファイルを生成する"):
-            # デスクトップ上のファイルパス
-            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-            file_path = os.path.join(desktop_path, "伝票(規格品)_ラベル_指示書.xlsm")
+            # GitHubのリポジトリURL
+            github_url = "https://github.com/yourusername/excel3/raw/main/伝票(規格品)_ラベル_指示書.xlsm"
 
-            # ファイル存在確認
-            if not os.path.exists(file_path):
-                st.error(f"指定されたファイルが見つかりません: {file_path}")
-            else:
-                wb = load_workbook(file_path, keep_vba=True)
-                ws = wb.active
+            # ファイルをダウンロードして一時ファイルとして保存
+            response = requests.get(github_url)
+            if response.status_code == 200:
+                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                    tmp_file.write(response.content)
+                    file_path = tmp_file.name
+            
 
-            # Excelファイルへの書き込み
-            ws['AH3'] = syukka
-            ws['AM9'] = buturyu
-            ws['AB4'] = konpou + "梱包"
+              wb = load_workbook(file_path, keep_vba=True)
+              ws = wb.active
+                
+              # Excelファイルへの書き込み
+              ws['AH3'] = syukka
+              ws['AM9'] = buturyu
+              ws['AB4'] = konpou + "梱包"
 
-            zig_tok = ""
-            for i, text in enumerate(text_list):
-                if labels[i] == 'AC9-1':
-                    zig_tok = text
-                elif labels[i] == 'AC9':
-                    ws[labels[i]] = zig_tok + '-' + text
-                elif labels[i] == 'AC11':
-                    ws[labels[i]] = text + "様"
-                elif labels[i] == 'AC13':
-                    ws[labels[i]] = '届け先：' + text
-                elif labels[i] == 'AC15':
-                    ws[labels[i]] = text + "様" if text else "=AC11"
-                elif labels[i] == 'AC17':
-                    ws[labels[i]] = '現場名：' + text
-                else:
-                    ws[labels[i]] = text
+              zig_tok = ""
+              for i, text in enumerate(text_list):
+                  if labels[i] == 'AC9-1':
+                      zig_tok = text
+                  elif labels[i] == 'AC9':
+                      ws[labels[i]] = zig_tok + '-' + text
+                  elif labels[i] == 'AC11':
+                      ws[labels[i]] = text + "様"
+                  elif labels[i] == 'AC13':
+                      ws[labels[i]] = '届け先：' + text
+                  elif labels[i] == 'AC15':
+                      ws[labels[i]] = text + "様" if text else "=AC11"
+                  elif labels[i] == 'AC17':
+                      ws[labels[i]] = '現場名：' + text
+                  else:
+                      ws[labels[i]] = text
 
-            # 保存とダウンロード
-            wb.save(file_path)
-            st.success("Excelファイルが上書き保存されました！")                
+              # 保存とダウンロード
+              wb.save(file_path)
+              st.success("Excelファイルが上書き保存されました！")                
 
-            # ファイルをダウンロード
-            st.write("保存されたファイルを以下のリンクからダウンロードしてください:")
-            with open(file_path, "rb") as file:
-                st.download_button(
-                    label="ダウンロードする",
-                    data=file,
-                    file_name="伝票(規格品)_ラベル_指示書.xlsm",
-                    mime="application/vnd.ms-excel"
-                )
+              #ファイルをダウンロード
+              st.write("保存されたファイルを以下のリンクからダウンロードしてください:")
+              with open(file_path, "rb") as file:
+                  st.download_button(
+                      label="ダウンロードする",
+                      data=file,
+                      file_name="伝票(規格品)_ラベル_指示書.xlsm",
+                      mime="application/vnd.ms-excel"
+                  )
 
 if __name__ == "__main__":
     main()
-
