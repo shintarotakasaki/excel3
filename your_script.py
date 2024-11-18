@@ -58,7 +58,7 @@ def main():
         # Excel更新
         if st.button("Excelファイルを生成する"):
             # GitHubのリポジトリURL
-            github_url = "https://github.com/yourusername/excel3/raw/main/伝票(規格品)_ラベル_指示書.xlsm"
+            github_url = "https://github.com/shintarotakasaki/excel3/raw/main/伝票(規格品)_ラベル_指示書.xlsm"
 
             # ファイルをダウンロードして一時ファイルとして保存
             response = requests.get(github_url)
