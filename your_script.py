@@ -73,7 +73,8 @@ def main():
             
             try:
                 wb = load_workbook(file_path, keep_vba=True)
-                ws = wb.active
+                ws = wb['納品書控(製品)']
+                wb.active = ws
                 
                 # Excelファイルへの書き込み
                 ws['AH3'] = syukka
