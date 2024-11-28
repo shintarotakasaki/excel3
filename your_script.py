@@ -51,9 +51,11 @@ def main():
             st.write(f"**{label}**: {text}")
 
         # ユーザー入力
-        syukka = st.text_input("出荷日を入力してください（例: 2024年11月18日）")
-        buturyu = st.text_input("物流センターを入力してください")
-        konpou = st.text_input("梱包数を入力してください")
+        syukka = st.date_input("出荷日を入力してください")
+        buturyu = st.selectbox("物流センターを選択してください",['AX44', 'AX60', 'AX02','AX36','AX86','AX28'])
+        konpou = st.selectbox("梱包数を選択してください",['1','2','3','4','5','それ以上'])
+        if konpou =='それ以上':
+            konpou = st.text_input('梱包数を入力してください')
 
         # Excel更新
         if st.button("Excelファイルを生成する"):
